@@ -1,0 +1,1005 @@
+[index.html](https://github.com/user-attachments/files/21872567/index.html)
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Inmobiliaria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        /* Estilos personalizados para el calendario */
+        .calendar-day {
+            cursor: pointer;
+        }
+        .calendar-day.has-posts:hover {
+            background-color: #f0e4d8;
+        }
+        .calendar-day.active {
+            background-color: #d4b999;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 font-sans">
+    <!-- Barra de navegación -->
+    <nav class="bg-amber-900 text-white p-4 flex justify-between items-center">
+        <div class="flex items-center">
+            <button id="menuBtn" class="md:hidden mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <h1 class="text-xl font-bold">Admin Inmobiliaria</h1>
+        </div>
+        <div class="hidden md:flex items-center space-x-4">
+            <span id="userName" class="font-medium">Usuario</span>
+            <button class="bg-amber-700 hover:bg-amber-600 px-3 py-1 rounded">Salir</button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar bg-white w-64 min-h-screen p-4 border-r border-amber-200 absolute md:relative md:translate-x-0">
+            <div class="mb-8">
+                <h2 class="text-amber-900 font-bold mb-2 text-lg">Menú</h2>
+                <ul>
+                    <li class="mb-2">
+                        <button id="dashboardBtn" class="w-full text-left px-3 py-2 bg-amber-100 text-amber-900 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            Dashboard
+                        </button>
+                    </li>
+                    <li class="mb-2">
+                        <button id="propertiesBtn" class="w-full text-left px-3 py-2 hover:bg-amber-50 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Propiedades
+                        </button>
+                    </li>
+                    <li class="mb-2">
+                        <button id="marketingBtn" class="w-full text-left px-3 py-2 hover:bg-amber-50 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Marketing
+                        </button>
+                    </li>
+                    <li class="mb-2">
+                        <button id="inquiriesBtn" class="w-full text-left px-3 py-2 hover:bg-amber-50 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                            </svg>
+                            Consultas
+                        </button>
+                    </li>
+                    <li>
+                        <button id="reportsBtn" class="w-full text-left px-3 py-2 hover:bg-amber-50 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Reportes
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="flex-1 p-4 md:p-8">
+            <!-- Dashboard -->
+            <div id="dashboardSection">
+                <h2 class="text-2xl font-bold text-amber-900 mb-6">Dashboard</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500 text-sm">Propiedades</h3>
+                        <p class="text-3xl font-bold text-amber-700">24</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500 text-sm">En venta</h3>
+                        <p class="text-3xl font-bold text-amber-700">18</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500 text-sm">Consultas este mes</h3>
+                        <p class="text-3xl font-bold text-amber-700">156</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500 text-sm">Publicaciones</h3>
+                        <p class="text-3xl font-bold text-amber-700">32</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-amber-900 mb-4">Consultas por canal</h3>
+                        <div class="h-64">
+                            <canvas id="channelChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-amber-900 mb-4">Últimas propiedades</h3>
+                        <div class="space-y-2">
+                            <!-- Ejemplo de propiedades recientes -->
+                            <div class="flex items-center justify-between p-2 hover:bg-amber-50 rounded">
+                                <div>
+                                    <h4 class="font-medium">Casa en Palermo</h4>
+                                    <p class="text-sm text-gray-500">Dueño: María González</p>
+                                </div>
+                                <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded">En venta</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 hover:bg-amber-50 rounded">
+                                <div>
+                                    <h4 class="font-medium">Dpto en Recoleta</h4>
+                                    <p class="text-sm text-gray-500">Dueño: Juan Pérez</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Vendido</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 hover:bg-amber-50 rounded">
+                                <div>
+                                    <h4 class="font-medium">Terreno en Nordelta</h4>
+                                    <p class="text-sm text-gray-500">Dueño: Inversores SA</p>
+                                </div>
+                                <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded">En venta</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Propiedades -->
+            <div id="propertiesSection" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-amber-900">Propiedades</h2>
+                    <button id="addPropertyBtn" class="bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Agregar
+                    </button>
+                </div>
+
+                <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
+                    <div class="relative">
+                        <input type="text" id="propertySearch" placeholder="Buscar propiedades..." class="pl-10 pr-4 py-2 border rounded-lg w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <div class="flex space-x-2">
+                        <select id="propertyStatusFilter" class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                            <option value="">Todos los estados</option>
+                            <option value="En venta">En venta</option>
+                            <option value="Reservada">Reservada</option>
+                            <option value="Vendida">Vendida</option>
+                        </select>
+                        <select id="propertyTypeFilter" class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                            <option value="">Todos los tipos</option>
+                            <option value="Casa">Casa</option>
+                            <option value="Dpto">Departamento</option>
+                            <option value="Terreno">Terreno</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="propertiesContainer">
+                    <!-- Las propiedades se cargarán aquí con JavaScript -->
+                </div>
+            </div>
+
+            <!-- Marketing -->
+            <div id="marketingSection" class="hidden">
+                <h2 class="text-2xl font-bold text-amber-900 mb-6">Publicaciones de Marketing</h2>
+                
+                <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="col-span-2 bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Calendario de Publicaciones</h3>
+                        <div class="calendar" id="marketingCalendar">
+                            <!-- Calendario se generará con JavaScript -->
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Agregar Publicación</h3>
+                        <form id="addPostForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">Fecha</label>
+                                <input type="date" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">Plataforma</label>
+                                <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                    <option>Instagram Reel</option>
+                                    <option>Instagram Historia</option>
+                                    <option>Facebook</option>
+                                    <option>Twitter</option>
+                                    <option>LinkedIn</option>
+                                    <option>Otros</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">Propiedad</label>
+                                <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                    <option>Casa en Palermo</option>
+                                    <option>Dpto en Recoleta</option>
+                                    <option>Terreno en Nordelta</option>
+                                    <option>Oficina en Microcentro</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-2">Contenido</label>
+                                <textarea class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded">Guardar Publicación</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Últimas Publicaciones</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="text-left border-b">
+                                    <th class="py-2 px-4">Fecha</th>
+                                    <th class="py-2 px-4">Plataforma</th>
+                                    <th class="py-2 px-4">Propiedad</th>
+                                    <th class="py-2 px-4">Contenido</th>
+                                </tr>
+                            </thead>
+                            <tbody id="postsTable">
+                                <!-- Las publicaciones se cargarán aquí con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultas -->
+            <div id="inquiriesSection" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-amber-900">Consultas y Visitas</h2>
+                    <button id="addInquiryBtn" class="bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Agregar
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Consultas por Propiedad (últimos 30 días)</h3>
+                        <div class="h-64">
+                            <canvas id="inquiriesChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Agregar Consulta</h3>
+                        <form id="addInquiryForm">
+                            <div class="mb-3">
+                                <label class="block text-gray-700 mb-1">Fecha</label>
+                                <input type="date" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-gray-700 mb-1">Canal</label>
+                                <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                    <option>Instagram</option>
+                                    <option>Facebook</option>
+                                    <option>WhatsApp</option>
+                                    <option>Llamada</option>
+                                    <option>Presencial</option>
+                                    <option>Otros</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-gray-700 mb-1">Propiedad</label>
+                                <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                    <option>Casa en Palermo</option>
+                                    <option>Dpto en Recoleta</option>
+                                    <option>Terreno en Nordelta</option>
+                                    <option>Oficina en Microcentro</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-gray-700 mb-1">Observaciones</label>
+                                <textarea class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded">Guardar Consulta</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Historial de Consultas</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="text-left border-b">
+                                    <th class="py-2 px-4">Fecha</th>
+                                    <th class="py-2 px-4">Canal</th>
+                                    <th class="py-2 px-4">Propiedad</th>
+                                    <th class="py-2 px-4">Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inquiriesTable">
+                                <!-- Las consultas se cargarán aquí con JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes -->
+            <div id="reportsSection" class="hidden">
+                <h2 class="text-2xl font-bold text-amber-900 mb-6">Reportes para Dueños</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Generar Reporte</h3>
+                        <form id="reportForm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-1">Propiedad</label>
+                                    <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                        <option>Casa en Palermo</option>
+                                        <option>Dpto en Recoleta</option>
+                                        <option>Terreno en Nordelta</option>
+                                        <option>Oficina en Microcentro</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-1">Período</label>
+                                    <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                                        <option>Últimos 7 días</option>
+                                        <option>Últimos 30 días</option>
+                                        <option>Este mes</option>
+                                        <option>Mes anterior</option>
+                                        <option>Este año</option>
+                                        <option>Personalizado</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 mb-1">Secciones a incluir</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="rounded text-amber-600" checked>
+                                        <span class="ml-2">Resumen</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="rounded text-amber-600" checked>
+                                        <span class="ml-2">Consultas</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="rounded text-amber-600" checked>
+                                        <span class="ml-2">Publicaciones</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="checkbox" class="rounded text-amber-600">
+                                        <span class="ml-2">Visitas</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded">Generar Reporte</button>
+                        </form>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-2">Reporte de Ejemplo</h3>
+                        <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                            <h4 class="font-bold text-lg mb-2">Casa en Palermo - Últimos 30 días</h4>
+                            <div class="grid grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <p class="text-sm text-gray-500">Dueño:</p>
+                                    <p class="font-medium">María González</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Fecha:</p>
+                                    <p class="font-medium">01/06/2024 - 30/06/2024</p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h4 class="font-semibold text-amber-800 mb-1">Consultas recibidas:</h4>
+                                <p class="text-2xl font-bold">24</p>
+                                <canvas id="exampleChart" height="100"></canvas>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-amber-800 mb-1">Publicaciones:</h4>
+                                <ul class="list-disc pl-5">
+                                    <li>5 Instagram Reels</li>
+                                    <li>3 Facebook Posts</li>
+                                    <li>2 Instagram Stories</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 px-4 py-2 rounded border border-amber-200 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Exportar a PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold mb-4">Reportes Generados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="text-left border-b">
+                                    <th class="py-2 px-4">Fecha</th>
+                                    <th class="py-2 px-4">Propiedad</th>
+                                    <th class="py-2 px-4">Período</th>
+                                    <th class="py-2 px-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b hover:bg-amber-50">
+                                    <td class="py-2 px-4">30/06/2024</td>
+                                    <td class="py-2 px-4">Casa en Palermo</td>
+                                    <td class="py-2 px-4">Últimos 30 días</td>
+                                    <td class="py-2 px-4">
+                                        <button class="text-amber-700 hover:text-amber-600 mr-2">Ver</button>
+                                        <button class="text-amber-700 hover:text-amber-600">PDF</button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b hover:bg-amber-50">
+                                    <td class="py-2 px-4">15/06/2024</td>
+                                    <td class="py-2 px-4">Dpto en Recoleta</td>
+                                    <td class="py-2 px-4">Últimos 7 días</td>
+                                    <td class="py-2 px-4">
+                                        <button class="text-amber-700 hover:text-amber-600 mr-2">Ver</button>
+                                        <button class="text-amber-700 hover:text-amber-600">PDF</button>
+                                    </td>
+                                </tr>
+                                <tr class="border-b hover:bg-amber-50">
+                                    <td class="py-2 px-4">01/06/2024</td>
+                                    <td class="py-2 px-4">Terreno en Nordelta</td>
+                                    <td class="py-2 px-4">Mes de Mayo</td>
+                                    <td class="py-2 px-4">
+                                        <button class="text-amber-700 hover:text-amber-600 mr-2">Ver</button>
+                                        <button class="text-amber-700 hover:text-amber-600">PDF</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="propertyModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Detalles de Propiedad</h3>
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 mb-2">Información Básica</h4>
+                        <div class="space-y-2">
+                            <p><span class="font-medium">Dirección:</span> <span id="modalAddress">Av. Libertador 1234, Palermo</span></p>
+                            <p><span class="font-medium">Dueño:</span> <span id="modalOwner">María González</span></p>
+                            <p><span class="font-medium">Estado:</span> <span id="modalStatus" class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm">En venta</span></p>
+                            <p><span class="font-medium">Tipo:</span> <span id="modalType">Casa</span></p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 mb-2">Enlaces</h4>
+                        <a href="#" id="modalLink" class="text-amber-700 hover:text-amber-600 block mb-2">Ver publicación</a>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-2">Notas</h4>
+                        <p id="modalNotes" class="text-gray-600">El cliente pidió que se destaque el jardín en las fotos. Coordinar visita para nuevas fotos.</p>
+                    </div>
+                </div>
+                <div>
+                    <img src="https://placehold.co/600x400" alt="Casa moderna en Palermo con jardin frontal y dos plantas" class="w-full h-auto rounded-lg mb-4">
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded">Editar</button>
+                        <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">Historial</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-2">Publicaciones Relacionadas</h4>
+                <div class="bg-amber-50 rounded-lg p-3">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-medium">Instagram Reel - 15/06/2024</p>
+                            <p class="text-sm text-gray-600">Tour por la propiedad destacando el jardín y la terraza</p>
+                        </div>
+                        <button class="text-amber-700 hover:text-amber-600">Ver</button>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-medium">Facebook Post - 10/06/2024</p>
+                            <p class="text-sm text-gray-600">Fotos del living y cocina integrada</p>
+                        </div>
+                        <button class="text-amber-700 hover:text-amber-600">Ver</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="font-semibold text-gray-700 mb-2">Consultas Recientes</h4>
+                <div class="space-y-3">
+                    <div class="border-b pb-2">
+                        <div class="flex justify-between">
+                            <p class="font-medium">25/06/2024 - WhatsApp</p>
+                            <p class="text-sm text-gray-500">3 personas</p>
+                        </div>
+                        <p class="text-sm text-gray-600">Consulta por precio y disponibilidad para visita</p>
+                    </div>
+                    <div class="border-b pb-2">
+                        <div class="flex justify-between">
+                            <p class="font-medium">20/06/2024 - Instagram</p>
+                            <p class="text-sm text-gray-500">1 persona</p>
+                        </div>
+                        <p class="text-sm text-gray-600">Preguntó por metros cuadrados del jardín</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const sampleProperties = [
+            {
+                id: 1,
+                address: "Av. Libertador 1234, Palermo",
+                owner: "María González",
+                status: "En venta",
+                type: "Casa",
+                link: "#",
+                notes: "Destacar jardín en fotos"
+            },
+            {
+                id: 2,
+                address: "Av. Callao 567, Recoleta",
+                owner: "Juan Pérez",
+                status: "Vendido",
+                type: "Departamento",
+                link: "#",
+                notes: "Entrega en 30 días"
+            },
+            {
+                id: 3,
+                address: "Av. de los Lagos 789, Nordelta",
+                owner: "Inversores SA",
+                status: "En venta",
+                type: "Terreno",
+                link: "#",
+                notes: "Zona residencial premium"
+            },
+            {
+                id: 4,
+                address: "Av. Corrientes 2345, Microcentro",
+                owner: "Carlos Smith",
+                status: "Reservada",
+                type: "Oficina",
+                link: "#",
+                notes: "Amplio espacio para equipos"
+            }
+        ];
+
+        const samplePosts = [
+            {
+                date: "2024-06-15",
+                platform: "Instagram Reel",
+                property: "Casa en Palermo",
+                content: "Tour por la propiedad destacando el jardín"
+            },
+            {
+                date: "2024-06-10",
+                platform: "Facebook Post",
+                property: "Casa en Palermo",
+                content: "Fotos del living y cocina integrada"
+            },
+            {
+                date: "2024-06-05",
+                platform: "Instagram Story",
+                property: "Dpto en Recoleta",
+                content: "Historia con testimonios de dueño anterior"
+            }
+        ];
+
+        const sampleInquiries = [
+            {
+                date: "2024-06-25",
+                channel: "WhatsApp",
+                property: "Casa en Palermo",
+                observations: "Consulta por precio y disponibilidad para visita",
+                count: 3
+            },
+            {
+                date: "2024-06-20",
+                channel: "Instagram",
+                property: "Casa en Palermo",
+                observations: "Preguntó por metros cuadrados del jardín",
+                count: 1
+            },
+            {
+                date: "2024-06-18",
+                channel: "Llamada",
+                property: "Dpto en Recoleta",
+                observations: "Consulta por amenidades del edificio",
+                count: 2
+            }
+        ];
+
+        // Función para renderizar propiedades
+        function renderProperties() {
+            const container = document.getElementById('propertiesContainer');
+            container.innerHTML = '';
+            
+            sampleProperties.forEach(property => {
+                const statusColors = {
+                    'En venta': 'bg-amber-100 text-amber-800',
+                    'Reservada': 'bg-blue-100 text-blue-800',
+                    'Vendido': 'bg-green-100 text-green-800'
+                };
+                
+                const card = document.createElement('div');
+                card.className = 'property-card bg-white rounded-lg shadow p-4 transition duration-300 ease-in-out';
+                card.innerHTML = `
+                    <div class="flex justify-between mb-2">
+                        <h3 class="font-bold text-lg text-amber-900">${property.address}</h3>
+                        <span class="text-xs px-2 py-1 rounded ${statusColors[property.status]}">${property.status}</span>
+                    </div>
+                    <p class="text-gray-600 mb-2">Dueño: ${property.owner}</p>
+                    <p class="text-gray-600 mb-4">Tipo: ${property.type}</p>
+                    <button class="view-property-btn w-full bg-amber-700 hover:bg-amber-600 text-white px-4 py-2 rounded" data-id="${property.id}">
+                        Ver detalles
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+
+            // Añadir eventos a los botones
+            document.querySelectorAll('.view-property-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    const property = sampleProperties.find(p => p.id === id);
+                    openPropertyModal(property);
+                });
+            });
+        }
+
+        // Función para abrir el modal de propiedad
+        function openPropertyModal(property) {
+            document.getElementById('modalAddress').textContent = property.address;
+            document.getElementById('modalOwner').textContent = property.owner;
+            document.getElementById('modalStatus').textContent = property.status;
+            document.getElementById('modalType').textContent = property.type;
+            document.getElementById('modalLink').href = property.link;
+            document.getElementById('modalNotes').textContent = property.notes;
+            
+            // Configurar el color del estado según corresponda
+            const statusColors = {
+                'En venta': 'bg-amber-100 text-amber-800',
+                'Reservada': 'bg-blue-100 text-blue-800',
+                'Vendido': 'bg-green-100 text-green-800'
+            };
+            document.getElementById('modalStatus').className = `${statusColors[property.status]} px-2 py-1 rounded text-sm`;
+            
+            document.getElementById('propertyModal').classList.remove('hidden');
+        }
+
+        // Función para renderizar publicaciones en la tabla
+        function renderPosts() {
+            const table = document.getElementById('postsTable');
+            table.innerHTML = '';
+            
+            samplePosts.forEach(post => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-amber-50';
+                row.innerHTML = `
+                    <td class="py-2 px-4">${post.date}</td>
+                    <td class="py-2 px-4">${post.platform}</td>
+                    <td class="py-2 px-4">${post.property}</td>
+                    <td class="py-2 px-4">${post.content}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Función para renderizar consultas en la tabla
+        function renderInquiries() {
+            const table = document.getElementById('inquiriesTable');
+            table.innerHTML = '';
+            
+            sampleInquiries.forEach(inquiry => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-amber-50';
+                row.innerHTML = `
+                    <td class="py-2 px-4">${inquiry.date}</td>
+                    <td class="py-2 px-4">${inquiry.channel}</td>
+                    <td class="py-2 px-4">${inquiry.property}</td>
+                    <td class="py-2 px-4">${inquiry.observations}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Función para generar el calendario
+        function generateCalendar() {
+            const calendarDiv = document.getElementById('marketingCalendar');
+            calendarDiv.innerHTML = '';
+            
+            const now = new Date();
+            const month = now.getMonth();
+            const year = now.getFullYear();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month, daysInMonth).getDay();
+            
+            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            
+            const header = document.createElement('div');
+            header.className = 'flex justify-between items-center mb-4';
+            header.innerHTML = `
+                <h4 class="font-semibold">${monthNames[month]} ${year}</h4>
+                <div class="flex space-x-2">
+                    <button class="px-2 py-1 bg-amber-100 rounded">&lt;</button>
+                    <button class="px-2 py-1 bg-amber-700 text-white rounded">Hoy</button>
+                    <button class="px-2 py-1 bg-amber-100 rounded">&gt;</button>
+                </div>
+            `;
+            calendarDiv.appendChild(header);
+            
+            const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const daysRow = document.createElement('div');
+            daysRow.className = 'grid grid-cols-7 gap-1 mb-1 text-center text-sm font-medium text-gray-500';
+            
+            dayNames.forEach(day => {
+                const dayDiv = document.createElement('div');
+                dayDiv.textContent = day;
+                daysRow.appendChild(dayDiv);
+            });
+            calendarDiv.appendChild(daysRow);
+            
+            const daysGrid = document.createElement('div');
+            daysGrid.className = 'grid grid-cols-7 gap-1';
+            
+            // Días vacíos al inicio
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'h-12';
+                daysGrid.appendChild(emptyDiv);
+            }
+            
+            // Días del mes
+            const postDates = samplePosts.map(post => new Date(post.date).getDate());
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day h-12 flex items-center justify-center border rounded';
+                
+                if (postDates.includes(day)) {
+                    dayDiv.classList.add('has-posts', 'bg-amber-50');
+                }
+                
+                if (day === now.getDate() && month === now.getMonth() && year === now.getFullYear()) {
+                    dayDiv.classList.add('active');
+                }
+                
+                dayDiv.textContent = day;
+                daysGrid.appendChild(dayDiv);
+            }
+            
+            // Días vacíos al final
+            for (let i = lastDay; i < 6; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'h-12';
+                daysGrid.appendChild(emptyDiv);
+            }
+            
+            calendarDiv.appendChild(daysGrid);
+        }
+
+        // Función para inicializar gráficos
+        function initCharts() {
+            // Gráfico de canales
+            const channelCtx = document.getElementById('channelChart').getContext('2d');
+            new Chart(channelCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Instagram', 'Facebook', 'WhatsApp', 'Llamada', 'Presencial'],
+                    datasets: [{
+                        data: [65, 25, 40, 15, 10],
+                        backgroundColor: [
+                            '#F59E0B',
+                            '#3B82F6',
+                            '#10B981',
+                            '#6366F1',
+                            '#EC4899'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de consultas por propiedad
+            const inquiriesCtx = document.getElementById('inquiriesChart').getContext('2d');
+            new Chart(inquiriesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Casa Palermo', 'Dpto Recoleta', 'Terreno Nordelta', 'Oficina'],
+                    datasets: [{
+                        label: 'Consultas',
+                        data: [24, 18, 12, 8],
+                        backgroundColor: '#F59E0B'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de ejemplo en reporte
+            const exampleCtx = document.getElementById('exampleChart').getContext('2d');
+            new Chart(exampleCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+                    datasets: [{
+                        label: 'Consultas por semana',
+                        data: [3, 7, 9, 5],
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Función para cambiar de sección
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('div[id$="Section"]').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Mostrar la sección solicitada
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Marcar el botón activo en el sidebar
+            document.querySelectorAll('#sidebar button').forEach(btn => {
+                btn.classList.remove('bg-amber-100', 'text-amber-900');
+            });
+            
+            document.getElementById(sectionId.replace('Section', 'Btn')).classList.add('bg-amber-100', 'text-amber-900');
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Renderizar datos iniciales
+            renderProperties();
+            renderPosts();
+            renderInquiries();
+            generateCalendar();
+            initCharts();
+            
+            // Mostrar dashboard por defecto
+            showSection('dashboardSection');
+            
+            // Menú mobile
+            document.getElementById('menuBtn').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+            
+            // Botones del sidebar
+            document.getElementById('dashboardBtn').addEventListener('click', function() {
+                showSection('dashboardSection');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+            
+            document.getElementById('propertiesBtn').addEventListener('click', function() {
+                showSection('propertiesSection');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+            
+            document.getElementById('marketingBtn').addEventListener('click', function() {
+                showSection('marketingSection');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+            
+            document.getElementById('inquiriesBtn').addEventListener('click', function() {
+                showSection('inquiriesSection');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+            
+            document.getElementById('reportsBtn').addEventListener('click', function() {
+                showSection('reportsSection');
+                document.getElementById('sidebar').classList.remove('active');
+            });
+            
+            // Cerrar modal
+            document.getElementById('closeModalBtn').addEventListener('click', function() {
+                document.getElementById('propertyModal').classList.add('hidden');
+            });
+            
+            // Agregar propiedad
+            document.getElementById('addPropertyBtn').addEventListener('click', function() {
+                alert('Funcionalidad para agregar nueva propiedad');
+            });
+            
+            // Agregar consulta
+            document.getElementById('addInquiryBtn').addEventListener('click', function() {
+                alert('Funcionalidad para agregar nueva consulta');
+            });
+            
+            // Filtrar propiedades
+            document.getElementById('propertyStatusFilter').addEventListener('change', function() {
+                alert('Filtrar por estado: ' + this.value);
+            });
+            
+            document.getElementById('propertyTypeFilter').addEventListener('change', function() {
+                alert('Filtrar por tipo: ' + this.value);
+            });
+            
+            document.getElementById('propertySearch').addEventListener('input', function() {
+                alert('Buscar propiedad: ' + this.value);
+            });
+        });
+    </script>
+</body>
+</html>
